@@ -2,8 +2,15 @@ import React, { useState } from 'react';
 
 function UploadMassa({ contaAtiva }) {
   const [videos, setVideos] = useState([]);
-  const [legendaPadrao, setLegendaPadrao] = useState('');
-  const [capaPadrao, setCapaPadrao] = useState(null); // NOVO ESTADO PARA A CAPA
+  const [legendaPadrao, setLegendaPadrao] = useState('Novo vídeo no canal! 🚀 #viral');
+  const [capaPadrao, setCapaPadrao] = useState(null);
+  
+  // NOVOS ESTADOS PARA O MODO DE INTERVALO
+  const [modoAgendamento, setModoAgendamento] = useState('grade'); // 'grade' ou 'intervalo'
+  const [intervaloMinutos, setIntervaloMinutos] = useState(30);
+  const [dataInicio, setDataInicio] = useState('');
+  const [horaInicio, setHoraInicio] = useState('');
+
   const [status, setStatus] = useState('');
   const [progresso, setProgresso] = useState(0);
   const [emAndamento, setEmAndamento] = useState(false);
@@ -25,7 +32,17 @@ function UploadMassa({ contaAtiva }) {
   const iniciarUpload = async () => {
     if (videos.length === 0) return;
     
-    const confirmacao = window.confirm(`Atenção: Os ${videos.length} vídeos serão agendados automaticamente usando a Grade de Horários desta conta. Deseja continuar?`);
+    // Validação extra para o modo de intervalo
+    if (modoAgendamento === 'intervalo' && (!dataInicio || !horaInicio || intervaloMinutos < 1)) {
+      alert("Por favor, preencha a Data de Início, Hora de Início e o Intervalo corretamente.");
+      return;
+    }
+    
+    const mensagemConfirmacao = modoAgendamento === 'grade' 
+      ? `Os ${videos.length} vídeos serão agendados usando a Grade de Horários.` 
+      : `Os ${videos.length} vídeos serão agendados a cada ${intervaloMinutos} minutos a partir de ${dataInicio} às ${horaInicio}.`;
+      
+    const confirmacao = window.confirm(`Atenção: ${mensagemConfirmacao} Deseja continuar?`);
     if (!confirmacao) return;
 
     setEmAndamento(true);
@@ -44,9 +61,18 @@ function UploadMassa({ contaAtiva }) {
       formData.append('legenda', legendaPadrao);
       formData.append('conta_id', contaAtiva);
       
-      // SE HOUVER CAPA, ADICIONA AO FORMDATA
+      // Enviamos o modo e a posição do vídeo para o backend conseguir calcular a hora exata
+      formData.append('modo_agendamento', modoAgendamento);
+      formData.append('posicao_fila', i); // Passamos a posição do loop (0, 1, 2...)
+      
       if (capaPadrao) {
         formData.append('capa', capaPadrao);
+      }
+      
+      if (modoAgendamento === 'intervalo') {
+        formData.append('data_inicio', dataInicio);
+        formData.append('hora_inicio', horaInicio);
+        formData.append('intervalo_minutos', intervaloMinutos);
       }
 
       try {
@@ -85,7 +111,7 @@ function UploadMassa({ contaAtiva }) {
       setTimeout(() => {
         setVideos([]);
         setCapaPadrao(null);
-        document.getElementById('input-capa-massa').value = '';
+        if(document.getElementById('input-capa-massa')) document.getElementById('input-capa-massa').value = '';
         setProgresso(0);
         setStatus('');
       }, 4000);
@@ -97,18 +123,18 @@ function UploadMassa({ contaAtiva }) {
       
       <div className="mb-6 shrink-0">
         <h2 className="text-3xl font-bold text-gray-800">Upload em Massa</h2>
-        <p className="text-gray-500 mt-2">Selecione vários vídeos de uma vez. O motor irá agendá-los automaticamente com base na sua Grade de Horários.</p>
+        <p className="text-gray-500 mt-2">Envie dezenas de vídeos de uma vez. O sistema encaixa-os automaticamente nos seus horários.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1 min-h-0 overflow-hidden mb-4">
         
         {/* COLUNA ESQUERDA: Configuração */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-fit shrink-0">
-          <h3 className="text-xl font-semibold mb-5 flex items-center gap-2">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full overflow-y-auto shrink-0 scrollbar-thin">
+          <h3 className="text-xl font-semibold mb-5 flex items-center gap-2 shrink-0">
             ⚙️ Configuração
           </h3>
           
-          <div className="space-y-5">
+          <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">1. Selecionar Vídeos</label>
               <input 
@@ -121,35 +147,87 @@ function UploadMassa({ contaAtiva }) {
               />
             </div>
 
-            {/* NOVO CAMPO DE CAPA */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">2. Capa Padrão (Opcional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">2. Capa & Legenda (Padrão)</label>
               <input 
                 id="input-capa-massa"
                 type="file" 
                 accept="image/*" 
                 onChange={(e) => setCapaPadrao(e.target.files[0])} 
                 disabled={emAndamento}
-                className="w-full text-sm border border-dashed border-gray-300 bg-gray-50 p-4 rounded-xl cursor-pointer focus:outline-none" 
+                className="w-full text-sm border border-dashed border-gray-300 bg-gray-50 p-3 rounded-xl cursor-pointer focus:outline-none mb-2" 
               />
-              <p className="text-xs text-gray-400 mt-2">Esta imagem será aplicada como capa a todos os vídeos deste lote.</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">3. Legenda Padrão</label>
               <textarea 
                 value={legendaPadrao} 
                 onChange={(e) => setLegendaPadrao(e.target.value)} 
                 disabled={emAndamento}
-                className="w-full border p-3 rounded-xl h-32 bg-gray-50 resize-none outline-none focus:ring-2 focus:ring-blue-500" 
-                placeholder="Esta legenda será aplicada a todos os vídeos enviados neste lote..."
+                className="w-full border p-3 rounded-xl h-24 bg-gray-50 resize-none outline-none focus:ring-2 focus:ring-blue-500 text-sm" 
+                placeholder="Legenda para os vídeos..."
               ></textarea>
+            </div>
+
+            {/* SELETOR DE MODO DE AGENDAMENTO */}
+            <div className="border-t border-gray-100 pt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-3">3. Como deseja agendar?</label>
+              
+              <div className="flex gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setModoAgendamento('grade')}
+                  className={`flex-1 py-2.5 px-3 text-sm font-semibold rounded-xl border transition-all ${modoAgendamento === 'grade' ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+                >
+                  📅 Usar Grade
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModoAgendamento('intervalo')}
+                  className={`flex-1 py-2.5 px-3 text-sm font-semibold rounded-xl border transition-all ${modoAgendamento === 'intervalo' ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+                >
+                  ⏱️ Intervalo Fixo
+                </button>
+              </div>
+
+              {/* CAMPOS DO INTERVALO (Condicionais) */}
+              {modoAgendamento === 'intervalo' && (
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4 animate-fade-in">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Intervalo (Minutos)</label>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      value={intervaloMinutos} 
+                      onChange={(e) => setIntervaloMinutos(Number(e.target.value))} 
+                      className="w-full border p-2.5 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500" 
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Data Início</label>
+                      <input 
+                        type="date" 
+                        value={dataInicio} 
+                        onChange={(e) => setDataInicio(e.target.value)} 
+                        className="w-full border p-2.5 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Hora Início</label>
+                      <input 
+                        type="time" 
+                        value={horaInicio} 
+                        onChange={(e) => setHoraInicio(e.target.value)} 
+                        className="w-full border p-2.5 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500" 
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             <button 
               onClick={iniciarUpload}
               disabled={videos.length === 0 || emAndamento}
-              className={`w-full font-bold py-4 rounded-xl transition-all shadow-md mt-4 ${
+              className={`w-full font-bold py-4 rounded-xl transition-all shadow-md mt-2 ${
                 videos.length === 0 || emAndamento 
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none' 
                 : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-500/30 transform hover:-translate-y-0.5'
@@ -160,7 +238,7 @@ function UploadMassa({ contaAtiva }) {
           </div>
         </div>
 
-        {/* COLUNA DIREITA: Fila de Processamento */}
+        {/* COLUNA DIREITA: Fila de Processamento (Mantém-se igual) */}
         <div className="lg:col-span-2 h-full flex flex-col overflow-hidden">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full min-h-0 overflow-hidden">
             <h3 className="text-xl font-semibold mb-4 shrink-0">Fila de Processamento</h3>

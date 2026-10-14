@@ -4,6 +4,7 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
   const [contas, setContas] = useState([]);
   const [nomePerfil, setNomePerfil] = useState('');
   const [usuarioIg, setUsuarioIg] = useState('');
+  const [senha, setSenha] = useState(''); // <--- NOVO ESTADO
   const [fotoPerfil, setFotoPerfil] = useState(null);
   const [mensagem, setMensagem] = useState('');
 
@@ -30,6 +31,8 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
     const formData = new FormData();
     formData.append('nome_perfil', nomePerfil);
     formData.append('usuario_ig', usuarioIg);
+    formData.append('senha', senha); // <--- ENVIAMOS PARA O BACKEND
+    
     if (fotoPerfil) {
       formData.append('foto_perfil', fotoPerfil);
     }
@@ -45,10 +48,10 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
         setMensagem('✅ Conta adicionada com sucesso!');
         setNomePerfil('');
         setUsuarioIg('');
+        setSenha(''); // Limpa o campo
         setFotoPerfil(null);
-        document.getElementById('input-foto-perfil').value = '';
+        if(document.getElementById('input-foto-perfil')) document.getElementById('input-foto-perfil').value = '';
         
-        // Dá um refresh na página para o App.jsx puxar as novas contas para a barra lateral
         setTimeout(() => window.location.reload(), 1500);
       }
     } catch (erro) {
@@ -86,7 +89,7 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
       
       <div className="mb-6 shrink-0">
         <h2 className="text-3xl font-bold text-gray-800">Gerir Contas de Instagram</h2>
-        <p className="text-gray-500 mt-2">Adicione ou remova contas do sistema. O Postvio é totalmente multi-conta.</p>
+        <p className="text-gray-500 mt-2">Adicione ou remova contas do sistema. O motor usa estas credenciais para publicar automaticamente.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1 min-h-0 overflow-hidden mb-4">
@@ -98,13 +101,20 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
           </h3>
           <form onSubmit={adicionarConta} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Perfil</label>
-              <input type="text" value={nomePerfil} onChange={(e) => setNomePerfil(e.target.value)} required placeholder="Ex: Minha Conta Principal" className="w-full border p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Perfil (Apelido)</label>
+              <input type="text" value={nomePerfil} onChange={(e) => setNomePerfil(e.target.value)} required placeholder="Ex: Conta Cliente X" className="w-full border p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Usuário do Instagram (@)</label>
-              <input type="text" value={usuarioIg} onChange={(e) => setUsuarioIg(e.target.value)} required placeholder="Ex: @seu_perfil" className="w-full border p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" />
+              <input type="text" value={usuarioIg} onChange={(e) => setUsuarioIg(e.target.value)} required placeholder="Ex: seu_perfil" className="w-full border p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            {/* NOVO CAMPO DE SENHA */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Palavra-passe</label>
+              <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required placeholder="••••••••" className="w-full border p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" />
+              <p className="text-xs text-gray-400 mt-1">Apenas usada localmente pelo motor de publicação.</p>
             </div>
 
             <div>
@@ -113,7 +123,7 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
             </div>
 
             <button type="submit" className="w-full bg-gray-900 hover:bg-black text-white font-semibold py-3 rounded-xl transition-colors mt-2 shadow-md">
-              Adicionar Conta
+              Adicionar Conta Segura
             </button>
             {mensagem && <p className="text-sm text-center font-medium text-blue-600 mt-2">{mensagem}</p>}
           </form>
@@ -129,13 +139,16 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
                 <div key={c.id} className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all group">
                   <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden border border-blue-200">
                     {c.foto_perfil ? (
-                      <img src={c.foto_perfil} alt="" className="w-full h-full object-cover" />
+                      <img src={`http://localhost:8000/${c.foto_perfil}`} alt="" className="w-full h-full object-cover" onError={(e) => {e.target.onerror = null; e.target.style.display='none'}} />
                     ) : c.nome_perfil ? c.nome_perfil.charAt(0).toUpperCase() : 'P'}
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-gray-800 truncate">{c.nome_perfil}</p>
                     <p className="text-xs text-gray-500 truncate">@{c.usuario_ig}</p>
+                    <p className="text-[10px] text-green-600 mt-0.5 font-semibold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span> Credenciais Ativas
+                    </p>
                   </div>
                   
                   <button 

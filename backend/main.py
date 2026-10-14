@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
+from servicos.motor_publicacao import iniciar_motor_em_segundo_plano
 
 # Importar as rotas e serviços refatorados
 from rotas import contas, agendamentos, horarios
@@ -12,6 +13,10 @@ from servicos.motor import verificar_e_publicar_videos
 load_dotenv()
 
 app = FastAPI()
+
+@app.on_event("startup")
+def startup_event():
+    iniciar_motor_em_segundo_plano()
 
 os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
