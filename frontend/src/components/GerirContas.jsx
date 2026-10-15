@@ -4,7 +4,7 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
   const [contas, setContas] = useState([]);
   const [nomePerfil, setNomePerfil] = useState('');
   const [usuarioIg, setUsuarioIg] = useState('');
-  const [senha, setSenha] = useState(''); // <--- NOVO ESTADO
+  const [senha, setSenha] = useState(''); 
   const [fotoPerfil, setFotoPerfil] = useState(null);
   const [mensagem, setMensagem] = useState('');
 
@@ -31,7 +31,7 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
     const formData = new FormData();
     formData.append('nome_perfil', nomePerfil);
     formData.append('usuario_ig', usuarioIg);
-    formData.append('senha', senha); // <--- ENVIAMOS PARA O BACKEND
+    formData.append('senha', senha); 
     
     if (fotoPerfil) {
       formData.append('foto_perfil', fotoPerfil);
@@ -110,12 +110,27 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
               <input type="text" value={usuarioIg} onChange={(e) => setUsuarioIg(e.target.value)} required placeholder="Ex: seu_perfil" className="w-full border p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
 
-            {/* NOVO CAMPO DE SENHA */}
+            {/* --- BLOCO NOVO: CHAVE DE SESSÃO COM TUTORIAL --- */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Palavra-passe</label>
-              <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required placeholder="••••••••" className="w-full border p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" />
-              <p className="text-xs text-gray-400 mt-1">Apenas usada localmente pelo motor de publicação.</p>
+              <label className="block text-sm font-bold text-gray-800 mb-1">🔑 Chave de Autenticação (Session ID)</label>
+              <input 
+                type="text" 
+                value={senha} 
+                onChange={(e) => setSenha(e.target.value)} 
+                required 
+                placeholder="Cole o código gigante que contém % aqui..." 
+                className="w-full border p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500" 
+              />
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-3 mt-3 text-xs text-gray-600 rounded-r-lg">
+                <strong className="block mb-1 text-gray-800">Como encontrar a sua chave em 3 passos:</strong>
+                <ol className="list-decimal pl-4 space-y-1">
+                  <li>Faça login no <b>instagram.com</b> pelo computador.</li>
+                  <li>Aperte <b>F12</b>, vá à aba <b>Application</b> e clique em <b>Cookies</b> no menu lateral.</li>
+                  <li>Procure o item <b>sessionid</b>, copie o valor gigante e cole acima.</li>
+                </ol>
+              </div>
             </div>
+            {/* --- FIM DO BLOCO NOVO --- */}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Foto de Perfil (Opcional)</label>
