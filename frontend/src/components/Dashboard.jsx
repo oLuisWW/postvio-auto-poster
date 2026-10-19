@@ -19,7 +19,16 @@ function Dashboard({ contaAtiva }) {
 
   const carregarFila = async () => {
     try {
-      const resposta = await fetch(`http://localhost:8000/agendar/fila/?conta_id=${contaAtiva}`);
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
+      const resposta = await fetch(`http://localhost:8000/agendar/fila/?conta_id=${contaAtiva}`, {
+        headers: {
+          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+        }
+      });
+      
+      if (resposta.status === 401) return; // Se não tiver acesso, ignora (App trata o logout)
+      
       const dados = await resposta.json();
       if (dados.status === 'sucesso') {
         setFila(dados.fila);
@@ -45,8 +54,13 @@ function Dashboard({ contaAtiva }) {
     }
 
     try {
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
       const resposta = await fetch('http://localhost:8000/agendar/', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+        },
         body: formData,
       });
       const dados = await resposta.json();
@@ -63,9 +77,11 @@ function Dashboard({ contaAtiva }) {
         if(document.getElementById('input-capa')) document.getElementById('input-capa').value = '';
 
         carregarFila();
+      } else {
+        setMensagem(`❌ Erro: ${dados.detail || 'Falha ao agendar'}`);
       }
     } catch (erro) {
-      setMensagem('❌ Erro ao agendar vídeo.');
+      setMensagem('❌ Erro de conexão ao agendar vídeo.');
     }
   };
 
@@ -74,8 +90,13 @@ function Dashboard({ contaAtiva }) {
     if (!confirmacao) return;
 
     try {
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
       const resposta = await fetch(`http://localhost:8000/agendar/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+        }
       });
       const dados = await resposta.json();
       if (dados.status === 'sucesso') carregarFila();
@@ -89,8 +110,13 @@ function Dashboard({ contaAtiva }) {
     if (!confirmacao) return;
 
     try {
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
       const resposta = await fetch(`http://localhost:8000/agendar/concluidos/${contaAtiva}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+        }
       });
       const dados = await resposta.json();
       if (dados.status === 'sucesso') carregarFila();

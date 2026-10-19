@@ -76,8 +76,14 @@ function UploadMassa({ contaAtiva }) {
       }
 
       try {
+        const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave JWT
+        
         const resposta = await fetch('http://localhost:8000/agendar/auto/', {
           method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}` // 🔒 Mostra a chave ao segurança
+            // Nota: Não defina 'Content-Type' manualmente com FormData, o navegador faz isso automaticamente com os boundaries
+          },
           body: formData,
         });
         

@@ -14,7 +14,16 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
 
   const carregarContas = async () => {
     try {
-      const resposta = await fetch('http://localhost:8000/contas/');
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
+      const resposta = await fetch('http://localhost:8000/contas/', {
+        headers: {
+          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave ao segurança
+        }
+      });
+      
+      if (resposta.status === 401) return; // Se não tiver acesso, ignora silenciosamente (o App trata do logout)
+      
       const dados = await resposta.json();
       if (dados.status === 'sucesso') {
         setContas(dados.contas);
@@ -38,8 +47,13 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
     }
 
     try {
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
       const resposta = await fetch('http://localhost:8000/contas/', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+        },
         body: formData,
       });
       const dados = await resposta.json();
@@ -48,14 +62,16 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
         setMensagem('✅ Conta adicionada com sucesso!');
         setNomePerfil('');
         setUsuarioIg('');
-        setSenha(''); // Limpa o campo
+        setSenha(''); 
         setFotoPerfil(null);
         if(document.getElementById('input-foto-perfil')) document.getElementById('input-foto-perfil').value = '';
         
         setTimeout(() => window.location.reload(), 1500);
+      } else {
+        setMensagem(`❌ Erro: ${dados.detail || 'Falha ao adicionar'}`);
       }
     } catch (erro) {
-      setMensagem('❌ Erro ao adicionar conta. Verifique o backend.');
+      setMensagem('❌ Erro de conexão ao adicionar conta.');
     }
   };
 
@@ -69,8 +85,13 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
     if (!confirmacao) return;
 
     try {
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
       const resposta = await fetch(`http://localhost:8000/contas/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+        }
       });
       const dados = await resposta.json();
       if (dados.status === 'sucesso') {
@@ -78,6 +99,8 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
           setContaAtiva(contas.find(c => c.id !== id).id);
         }
         setTimeout(() => window.location.reload(), 500);
+      } else {
+        alert(dados.detail || "Erro ao apagar conta.");
       }
     } catch (erro) {
       console.error("Erro ao apagar conta:", erro);

@@ -24,7 +24,16 @@ function GradeHorarios({ contaAtiva }) {
 
   const carregarHorarios = async () => {
     try {
-      const resposta = await fetch(`http://localhost:8000/horarios/?conta_id=${contaAtiva}`);
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
+      const resposta = await fetch(`http://localhost:8000/horarios/?conta_id=${contaAtiva}`, {
+        headers: {
+          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+        }
+      });
+      
+      if (resposta.status === 401) return; // Se não tiver acesso, ignora
+      
       const dados = await resposta.json();
       if (dados.status === 'sucesso') {
         setHorarios(dados.horarios);
@@ -53,6 +62,8 @@ function GradeHorarios({ contaAtiva }) {
     setMensagem('A guardar...');
 
     try {
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
       const promessas = diasSelecionados.map(dia => {
         const formData = new FormData();
         formData.append('dia_semana', dia);
@@ -61,6 +72,9 @@ function GradeHorarios({ contaAtiva }) {
         
         return fetch('http://localhost:8000/horarios/', {
           method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+          },
           body: formData,
         });
       });
@@ -77,14 +91,20 @@ function GradeHorarios({ contaAtiva }) {
     }
   };
 
-  // Nova função: Apaga todos os dias associados àquela hora específica
   const apagarGrupoHorario = async (itensDoGrupo) => {
     const confirmacao = window.confirm("Deseja remover este horário de todos os dias configurados?");
     if (!confirmacao) return;
 
     try {
+      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      
       const promessas = itensDoGrupo.map(item => 
-        fetch(`http://localhost:8000/horarios/${item.id}`, { method: 'DELETE' })
+        fetch(`http://localhost:8000/horarios/${item.id}`, { 
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+          }
+        })
       );
       await Promise.all(promessas);
       carregarHorarios();
@@ -93,7 +113,6 @@ function GradeHorarios({ contaAtiva }) {
     }
   };
 
-  // Lógica para agrupar os horários recebidos do banco de dados pela hora
   const agruparHorarios = () => {
     const grupos = {};
     horarios.forEach(item => {
@@ -103,7 +122,6 @@ function GradeHorarios({ contaAtiva }) {
       }
       grupos[horaFormatada].push(item);
     });
-    // Ordena do mais cedo para o mais tarde
     return Object.entries(grupos).sort(([horaA], [horaB]) => horaA.localeCompare(horaB));
   };
 
@@ -182,7 +200,6 @@ function GradeHorarios({ contaAtiva }) {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto pr-2 flex-1 min-h-0 scrollbar-thin content-start">
                 
-                {/* Renderização agrupada por Hora */}
                 {horariosAgrupados.map(([horaGrupo, itensDoGrupo]) => (
                   <div key={horaGrupo} className="flex flex-col p-5 border border-gray-100 rounded-2xl bg-white shadow-sm hover:shadow-md transition-all group">
                     <div className="flex justify-between items-start mb-4">
@@ -198,7 +215,6 @@ function GradeHorarios({ contaAtiva }) {
                       </button>
                     </div>
                     
-                    {/* Exibe as bolinhas dos dias ativas/inativas para esta hora */}
                     <div className="flex justify-between gap-1">
                       {botoesDias.map(btn => {
                         const estaAtivo = itensDoGrupo.some(item => item.dia_semana === btn.id);
