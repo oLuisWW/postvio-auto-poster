@@ -120,6 +120,26 @@ app.include_router(horarios.router, prefix="/horarios", tags=["Horários"])
 def ler_raiz():
     return {"status": "sucesso", "mensagem": "API Multi-Contas do Postvio rodando!"}
 
+# --- ROTA TEMPORÁRIA PARA CORRIGIR A BASE DE DADOS ---
+@app.get("/corrigir-banco", tags=["Correção"])
+def corrigir_banco_dados():
+    conn = conectar_banco()
+    cursor = conn.cursor()
+    try:
+        # Tenta renomear a coluna se ela existir
+        cursor.execute("ALTER TABLE usuarios CHANGE senha senha_hash VARCHAR(255);")
+        msg = "Coluna 'senha' renomeada para 'senha_hash'."
+    except:
+        # Se não existir, adiciona a coluna do zero
+        cursor.execute("ALTER TABLE usuarios ADD COLUMN senha_hash VARCHAR(255);")
+        msg = "Coluna 'senha_hash' adicionada com sucesso."
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return {"status": "sucesso", "mensagem": msg}
+# -----------------------------------------------------
+
 # Iniciar o motor de publicação em segundo plano
 agendador = BackgroundScheduler()
 agendador.add_job(verificar_e_publicar_videos, 'interval', minutes=1)
