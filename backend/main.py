@@ -120,31 +120,6 @@ app.include_router(horarios.router, prefix="/horarios", tags=["Horários"])
 def ler_raiz():
     return {"status": "sucesso", "mensagem": "API Multi-Contas do Postvio rodando!"}
 
-# --- ROTA TEMPORÁRIA PARA CORRIGIR A BASE DE DADOS ---
-@app.get("/corrigir-banco", tags=["Correção"])
-def corrigir_banco_dados():
-    conn = conectar_banco()
-    cursor = conn.cursor()
-    try:
-        # 1. Remove a ligação (Foreign Key) temporariamente
-        cursor.execute("ALTER TABLE contas_instagram DROP FOREIGN KEY contas_instagram_ibfk_1;")
-        
-        # 2. Garante que ambas as colunas são exatamente do mesmo tipo (INT) e aplica o AUTO_INCREMENT
-        cursor.execute("ALTER TABLE usuarios MODIFY id INT AUTO_INCREMENT;")
-        cursor.execute("ALTER TABLE contas_instagram MODIFY usuario_id INT;")
-        
-        # 3. Recria a ligação entre as tabelas de forma segura
-        cursor.execute("ALTER TABLE contas_instagram ADD CONSTRAINT contas_instagram_ibfk_1 FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE;")
-        
-        msg = "Tipos de dados alinhados e AUTO_INCREMENT configurado com sucesso!"
-    except Exception as e:
-        msg = f"Erro ao ajustar banco: {e}"
-    
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return {"status": "sucesso", "mensagem": msg}
-# -----------------------------------------------------
 
 # Iniciar o motor de publicação em segundo plano
 agendador = BackgroundScheduler()
