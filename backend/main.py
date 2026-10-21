@@ -126,18 +126,18 @@ def corrigir_banco_dados():
     conn = conectar_banco()
     cursor = conn.cursor()
     try:
-        # 1. Desliga a proteção de chaves estrangeiras temporariamente
-        cursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        # 1. Remove a ligação (Foreign Key) temporariamente
+        cursor.execute("ALTER TABLE contas_instagram DROP FOREIGN KEY contas_instagram_ibfk_1;")
         
-        # 2. Aplica o AUTO_INCREMENT no ID
+        # 2. Garante que ambas as colunas são exatamente do mesmo tipo (INT) e aplica o AUTO_INCREMENT
         cursor.execute("ALTER TABLE usuarios MODIFY id INT AUTO_INCREMENT;")
+        cursor.execute("ALTER TABLE contas_instagram MODIFY usuario_id INT;")
         
-        # 3. Volta a ligar a proteção imediatamente
-        cursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+        # 3. Recria a ligação entre as tabelas de forma segura
+        cursor.execute("ALTER TABLE contas_instagram ADD CONSTRAINT contas_instagram_ibfk_1 FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE;")
         
-        msg = "Coluna 'id' ajustada para AUTO_INCREMENT com sucesso (Proteção contornada)!"
+        msg = "Tipos de dados alinhados e AUTO_INCREMENT configurado com sucesso!"
     except Exception as e:
-        cursor.execute("SET FOREIGN_KEY_CHECKS=1;") # Garante que volta a ligar em caso de erro
         msg = f"Erro ao ajustar banco: {e}"
     
     conn.commit()
