@@ -5,6 +5,7 @@ from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from instagrapi import Client
 from database import conectar_banco
+from moviepy.editor import VideoFileClip
 
 def otimizar_video_para_instagram(caminho_original):
     diretorio, nome_ficheiro = os.path.split(caminho_original)
