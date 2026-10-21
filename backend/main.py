@@ -41,13 +41,19 @@ def startup_event():
 os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
+# --- CORREÇÃO DO CORS AQUI ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:8000",
+        "https://postvio-auto-poster.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# -----------------------------
 
 # ===================================================================
 # ROTAS DE AUTENTICAÇÃO (SaaS)
