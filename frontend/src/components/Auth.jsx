@@ -22,7 +22,7 @@ const Auth = ({ onLoginSuccess }) => {
         formData.append('username', email); // O FastAPI OAuth2 chama username ao email
         formData.append('password', senha);
 
-        const response = await axios.post('http://localhost:8000/login', formData, {
+        const response = await axios.post('postvio-auto-poster-production.up.railway.app/login', formData, {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
 
@@ -34,7 +34,7 @@ const Auth = ({ onLoginSuccess }) => {
         onLoginSuccess();
       } else {
         // --- FAZER REGISTO ---
-        const response = await axios.post('http://localhost:8000/registrar', {
+        const response = await axios.post('postvio-auto-poster-production.up.railway.app/registrar', {
           nome: nome,
           email: email,
           senha: senha
