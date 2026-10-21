@@ -126,13 +126,11 @@ def corrigir_banco_dados():
     conn = conectar_banco()
     cursor = conn.cursor()
     try:
-        # Tenta renomear a coluna se ela existir
-        cursor.execute("ALTER TABLE usuarios CHANGE senha senha_hash VARCHAR(255);")
-        msg = "Coluna 'senha' renomeada para 'senha_hash'."
-    except:
-        # Se não existir, adiciona a coluna do zero
-        cursor.execute("ALTER TABLE usuarios ADD COLUMN senha_hash VARCHAR(255);")
-        msg = "Coluna 'senha_hash' adicionada com sucesso."
+        # Altera a coluna 'id' para gerar números automaticamente
+        cursor.execute("ALTER TABLE usuarios MODIFY id INT AUTO_INCREMENT;")
+        msg = "Coluna 'id' ajustada para AUTO_INCREMENT com sucesso!"
+    except Exception as e:
+        msg = f"Erro ao ajustar banco: {e}"
     
     conn.commit()
     cursor.close()
