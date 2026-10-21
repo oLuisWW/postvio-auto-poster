@@ -126,10 +126,18 @@ def corrigir_banco_dados():
     conn = conectar_banco()
     cursor = conn.cursor()
     try:
-        # Altera a coluna 'id' para gerar números automaticamente
+        # 1. Desliga a proteção de chaves estrangeiras temporariamente
+        cursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        
+        # 2. Aplica o AUTO_INCREMENT no ID
         cursor.execute("ALTER TABLE usuarios MODIFY id INT AUTO_INCREMENT;")
-        msg = "Coluna 'id' ajustada para AUTO_INCREMENT com sucesso!"
+        
+        # 3. Volta a ligar a proteção imediatamente
+        cursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+        
+        msg = "Coluna 'id' ajustada para AUTO_INCREMENT com sucesso (Proteção contornada)!"
     except Exception as e:
+        cursor.execute("SET FOREIGN_KEY_CHECKS=1;") # Garante que volta a ligar em caso de erro
         msg = f"Erro ao ajustar banco: {e}"
     
     conn.commit()
