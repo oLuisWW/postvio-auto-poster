@@ -17,7 +17,7 @@ function VisaoGeral({ contaAtiva, contas }) {
   const carregarDados = async () => {
     try {
       // Usamos a mesma rota da fila para fazer a matemática no frontend sem pesar o backend
-      const resposta = await fetch(`https://postvio-auto-poster-production.up.https://postvio-auto-poster.onrender.com/agendar/fila/?conta_id=${contaAtiva}`);
+      const resposta = await fetch(`https://postvio-auto-poster.onrender.com/agendar/fila/?conta_id=${contaAtiva}`);
       const dados = await resposta.json();
 
       if (dados.status === 'sucesso') {
