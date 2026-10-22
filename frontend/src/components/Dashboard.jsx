@@ -21,7 +21,7 @@ function Dashboard({ contaAtiva }) {
     try {
       const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
       
-      const resposta = await fetch(`https://postvio-auto-poster-production.up.railway.app/agendar/fila/?conta_id=${contaAtiva}`, {
+      const resposta = await fetch(`https://postvio-auto-poster-production.up.https://postvio-auto-poster.onrender.com/agendar/fila/?conta_id=${contaAtiva}`, {
         headers: {
           'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
         }
@@ -56,7 +56,7 @@ function Dashboard({ contaAtiva }) {
     try {
       const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
       
-      const resposta = await fetch('https://postvio-auto-poster-production.up.railway.app/agendar/', {
+      const resposta = await fetch('https://postvio-auto-poster-production.up.https://postvio-auto-poster.onrender.com/agendar/', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
@@ -92,7 +92,7 @@ function Dashboard({ contaAtiva }) {
     try {
       const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
       
-      const resposta = await fetch(`https://postvio-auto-poster-production.up.railway.app/agendar/${id}`, {
+      const resposta = await fetch(`https://postvio-auto-poster-production.up.https://postvio-auto-poster.onrender.com/agendar/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
@@ -112,7 +112,7 @@ function Dashboard({ contaAtiva }) {
     try {
       const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
       
-      const resposta = await fetch(`https://postvio-auto-poster-production.up.railway.app/agendar/concluidos/${contaAtiva}`, {
+      const resposta = await fetch(`https://postvio-auto-poster-production.up.https://postvio-auto-poster.onrender.com/agendar/concluidos/${contaAtiva}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
@@ -240,9 +240,9 @@ function Dashboard({ contaAtiva }) {
                   <div key={item.id} className="flex gap-4 p-4 border border-gray-100 rounded-xl hover:shadow-md transition-shadow bg-white shrink-0 group">
                     <div className="w-32 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
                       {item.caminho_capa ? (
-                        <img src={`https://postvio-auto-poster-production.up.railway.app/${item.caminho_capa}`} alt="Capa" className="w-full h-full object-cover" />
+                        <img src={`https://postvio-auto-poster-production.up.https://postvio-auto-poster.onrender.com/${item.caminho_capa}`} alt="Capa" className="w-full h-full object-cover" />
                       ) : (
-                        <video src={`https://postvio-auto-poster-production.up.railway.app/${item.caminho_video}`} className="w-full h-full object-cover" />
+                        <video src={`https://postvio-auto-poster-production.up.https://postvio-auto-poster.onrender.com/${item.caminho_video}`} className="w-full h-full object-cover" />
                       )}
                     </div>
                     

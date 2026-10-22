@@ -33,7 +33,7 @@ function App() {
     try {
       const token = localStorage.getItem('postvio_token');
       
-      const resposta = await fetch('https://postvio-auto-poster-production.up.railway.app/contas/', {
+      const resposta = await fetch('https://postvio-auto-poster-production.up.https://postvio-auto-poster.onrender.com/contas/', {
         headers: {
           'Authorization': `Bearer ${token}` // 🔑 A MAGIA DO SAAS: Enviamos o token para o backend
         }
