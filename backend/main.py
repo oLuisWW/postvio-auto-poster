@@ -14,7 +14,6 @@ from servicos.auth import obter_hash_senha, verificar_senha, criar_token_acesso
 
 # Importar as rotas e serviços refatorados
 from rotas import contas, agendamentos, horarios
-from servicos.motor import verificar_e_publicar_videos
 
 load_dotenv()
 
@@ -119,9 +118,3 @@ app.include_router(horarios.router, prefix="/horarios", tags=["Horários"])
 @app.get("/")
 def ler_raiz():
     return {"status": "sucesso", "mensagem": "API Multi-Contas do Postvio rodando!"}
-
-
-# Iniciar o motor de publicação em segundo plano
-agendador = BackgroundScheduler()
-agendador.add_job(verificar_e_publicar_videos, 'interval', minutes=1)
-agendador.start()
