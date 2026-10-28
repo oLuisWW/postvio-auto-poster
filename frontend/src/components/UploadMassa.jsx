@@ -78,7 +78,7 @@ function UploadMassa({ contaAtiva }) {
       try {
         const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave JWT
         
-        const resposta = await fetch('https://postvio-auto-poster.onrender.com/agendar/auto/', {
+        const resposta = await fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/agendar/auto/', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}` // 🔒 Mostra a chave ao segurança

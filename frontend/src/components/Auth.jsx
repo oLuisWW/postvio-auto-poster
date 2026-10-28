@@ -22,7 +22,7 @@ const Auth = ({ onLoginSuccess }) => {
         formData.append('username', email); // O FastAPI OAuth2 chama username ao email
         formData.append('password', senha);
 
-        const response = await axios.post('https://postvio-auto-poster.onrender.com/login', formData, {
+        const response = await axios.post('https://unapprovable-unneglected-pamelia.ngrok-free.dev/login', formData, {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
 
@@ -34,7 +34,7 @@ const Auth = ({ onLoginSuccess }) => {
         onLoginSuccess();
       } else {
         // --- FAZER REGISTO ---
-        const response = await axios.post('https://postvio-auto-poster.onrender.com/registrar', {
+        const response = await axios.post('https://unapprovable-unneglected-pamelia.ngrok-free.dev/registrar', {
           nome: nome,
           email: email,
           senha: senha

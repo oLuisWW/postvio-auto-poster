@@ -1,6 +1,6 @@
 from database import conectar_banco
 from datetime import datetime, timedelta
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 
 def obter_proximo_horario_livre(conta_id):
     conn = conectar_banco()

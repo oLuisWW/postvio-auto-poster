@@ -16,7 +16,7 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
     try {
       const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
       
-      const resposta = await fetch('https://postvio-auto-poster.onrender.com/contas/', {
+      const resposta = await fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/contas/', {
         headers: {
           'Authorization': `Bearer ${token}` // 🔒 Mostra a chave ao segurança
         }
@@ -49,7 +49,7 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
     try {
       const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
       
-      const resposta = await fetch('https://postvio-auto-poster.onrender.com/contas/', {
+      const resposta = await fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/contas/', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
@@ -87,7 +87,7 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
     try {
       const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
       
-      const resposta = await fetch(`https://postvio-auto-poster.onrender.com/contas/${id}`, {
+      const resposta = await fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/contas/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
@@ -177,7 +177,7 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
                 <div key={c.id} className="flex items-center gap-4 p-4 border border-gray-100 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all group">
                   <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden border border-blue-200">
                     {c.foto_perfil ? (
-                      <img src={`https://postvio-auto-poster.onrender.com/${c.foto_perfil}`} alt="" className="w-full h-full object-cover" onError={(e) => {e.target.onerror = null; e.target.style.display='none'}} />
+                      <img src={`https://unapprovable-unneglected-pamelia.ngrok-free.dev/${c.foto_perfil}`} alt="" className="w-full h-full object-cover" onError={(e) => {e.target.onerror = null; e.target.style.display='none'}} />
                     ) : c.nome_perfil ? c.nome_perfil.charAt(0).toUpperCase() : 'P'}
                   </div>
                   

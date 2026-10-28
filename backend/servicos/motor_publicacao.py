@@ -5,7 +5,7 @@ from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from instagrapi import Client
 from database import conectar_banco
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip 
 
 def otimizar_video_para_instagram(caminho_original):
     diretorio, nome_ficheiro = os.path.split(caminho_original)
@@ -25,14 +25,6 @@ def otimizar_video_para_instagram(caminho_original):
         "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k", "-r", "30",
         caminho_otimizado
     ]
-
-    try:
-        subprocess.run(comando, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        print("✅ Vídeo padronizado com Qualidade Premium!")
-        return caminho_otimizado
-    except Exception as e:
-        print(f"⚠️ Erro ao otimizar: {str(e)}. A enviar original...")
-        return caminho_original
 
     try:
         # Executa o FFmpeg de forma silenciosa
@@ -66,8 +58,16 @@ def verificar_e_publicar():
             print(f"🚀 Iniciando processamento do vídeo {video['id']} para a conta @{video['usuario_ig']}...")
 
             try:
+                # 🛡️ BLINDAGEM ABSOLUTA: Converte qualquer caminho relativo do banco para absoluto
+                DIRETORIO_BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                caminho_db = video['caminho_video']
+                if not os.path.isabs(caminho_db):
+                    caminho_video_absoluto = os.path.join(DIRETORIO_BASE, caminho_db)
+                else:
+                    caminho_video_absoluto = caminho_db
+
                 # 1. Otimizar o vídeo antes de enviar
-                video_para_enviar = otimizar_video_para_instagram(video['caminho_video'])
+                video_para_enviar = otimizar_video_para_instagram(caminho_video_absoluto)
 
                 # 2. Iniciar o Cliente do Instagram e configurar Disfarce
                 cl = Client()
@@ -100,8 +100,15 @@ def verificar_e_publicar():
                 # 3. Publicar o Vídeo Otimizado como Reels
                 print("A enviar ficheiro para o Instagram...")
                 
+                # Tratar também a capa se existir
+                caminho_capa_absoluto = None
                 if video.get('caminho_capa'):
-                    cl.clip_upload(video_para_enviar, legenda_post, thumbnail=video['caminho_capa'])
+                    if not os.path.isabs(video['caminho_capa']):
+                        caminho_capa_absoluto = os.path.join(DIRETORIO_BASE, video['caminho_capa'])
+                    else:
+                        caminho_capa_absoluto = video['caminho_capa']
+                    
+                    cl.clip_upload(video_para_enviar, legenda_post, thumbnail=caminho_capa_absoluto)
                 else:
                     cl.clip_upload(video_para_enviar, legenda_post)
 

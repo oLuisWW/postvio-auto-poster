@@ -8,6 +8,13 @@ from servicos.auth import obter_usuario_atual
 
 router = APIRouter()
 
+# --- CÓDIGO DE BLINDAGEM DA PASTA ---
+# Força o Windows a usar o caminho absoluto exato da sua máquina local
+DIRETORIO_BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PASTA_UPLOADS = os.path.join(DIRETORIO_BASE, "uploads")
+os.makedirs(PASTA_UPLOADS, exist_ok=True) # Cria a pasta automaticamente se não existir
+print(f"📂 A pasta de uploads oficial é: {PASTA_UPLOADS}")
+
 def verificar_dono_da_conta(cursor, conta_id: int, usuario_id: str):
     """🔒 Função de segurança SaaS: Verifica se a conta de Instagram pertence ao utilizador logado"""
     cursor.execute("SELECT id FROM contas_instagram WHERE id = %s AND usuario_id = %s", (conta_id, usuario_id))
@@ -29,13 +36,14 @@ async def agendar_video(
     try:
         verificar_dono_da_conta(cursor, conta_id, usuario_id) # 🔒 Impede invasões
         
-        caminho_video = f"uploads/{video.filename}"
+        # 2. Guardar Ficheiros (Com Caminho Absoluto Seguro)
+        caminho_video = os.path.join(PASTA_UPLOADS, video.filename)
         with open(caminho_video, "wb") as buffer:
             shutil.copyfileobj(video.file, buffer)
             
         caminho_capa = None
         if capa and capa.filename:
-            caminho_capa = f"uploads/capa_{capa.filename}"
+            caminho_capa = os.path.join(PASTA_UPLOADS, f"capa_{capa.filename}")
             with open(caminho_capa, "wb") as buffer:
                 shutil.copyfileobj(capa.file, buffer)
 
@@ -81,16 +89,18 @@ async def agendar_video_automatico(
             if not proximo_horario:
                 raise HTTPException(status_code=400, detail="Erro: Configure um horário na Grade para esta conta.")
                 
-        # 2. Guardar Ficheiros
-        caminho_video = f"uploads/{video.filename}"
+        # 2. Guardar Ficheiros (Com Caminho Absoluto Seguro)
+        caminho_video = os.path.join(PASTA_UPLOADS, video.filename)
         with open(caminho_video, "wb") as buffer:
             shutil.copyfileobj(video.file, buffer)
             
         caminho_capa = None
         if capa and capa.filename:
-            caminho_capa = f"uploads/capa_{capa.filename}"
+            caminho_capa = os.path.join(PASTA_UPLOADS, f"capa_{capa.filename}")
             with open(caminho_capa, "wb") as buffer:
                 shutil.copyfileobj(capa.file, buffer)
+
+                print(f"💾 A guardar vídeo em: {caminho_video}")
             
         # 3. Guardar na Base de Dados
         comando = "INSERT INTO postagens (caminho_video, legenda, data_hora_agendamento, status, caminho_capa, conta_id) VALUES (%s, %s, %s, 'PENDENTE', %s, %s)"

@@ -26,7 +26,7 @@ function GradeHorarios({ contaAtiva }) {
     try {
       const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
       
-      const resposta = await fetch(`https://postvio-auto-poster.onrender.com/horarios/?conta_id=${contaAtiva}`, {
+      const resposta = await fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/horarios/?conta_id=${contaAtiva}`, {
         headers: {
           'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
         }
@@ -70,7 +70,7 @@ function GradeHorarios({ contaAtiva }) {
         formData.append('horario', hora);
         formData.append('conta_id', contaAtiva);
         
-        return fetch('https://postvio-auto-poster.onrender.com/horarios/', {
+        return fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/horarios/', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
@@ -99,7 +99,7 @@ function GradeHorarios({ contaAtiva }) {
       const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
       
       const promessas = itensDoGrupo.map(item => 
-        fetch(`https://postvio-auto-poster.onrender.com/horarios/${item.id}`, { 
+        fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/horarios/${item.id}`, { 
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
