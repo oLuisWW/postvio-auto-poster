@@ -33,7 +33,7 @@ function App() {
     try {
       const token = localStorage.getItem('postvio_token');
       
-      const resposta = await fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/contas/', {
+      const resposta = await fetch('/api/contas/', {
         headers: {
           'Authorization': `Bearer ${token}` // 🔑 A MAGIA DO SAAS: Enviamos o token para o backend
         }
