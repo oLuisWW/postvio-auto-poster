@@ -9,18 +9,17 @@ function VisaoGeral({ contaAtiva, contas }) {
   });
 
   useEffect(() => {
-    if (contaAtiva) {
-      carregarDados();
-    }
+    if (contaAtiva) carregarDados();
   }, [contaAtiva]);
 
   const carregarDados = async () => {
     try {
-      const token = localStorage.getItem('postvio_token'); // Adicionado o token de segurança
+      const token = localStorage.getItem('postvio_token');
       
       const resposta = await fetch(`/api/agendar/fila/?conta_id=${contaAtiva}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
         }
       });
       const dados = await resposta.json();
@@ -29,7 +28,6 @@ function VisaoGeral({ contaAtiva, contas }) {
         const fila = dados.fila;
         const pendentes = fila.filter(v => v.status === 'PENDENTE');
         const concluidos = fila.filter(v => v.status === 'CONCLUIDO');
-
         const proxima = pendentes.length > 0 ? pendentes[0] : null;
 
         setEstatisticas({
@@ -48,7 +46,6 @@ function VisaoGeral({ contaAtiva, contas }) {
 
   return (
     <div className="max-w-6xl mx-auto flex flex-col h-full">
-      
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-gray-800">
@@ -57,69 +54,39 @@ function VisaoGeral({ contaAtiva, contas }) {
           <p className="text-gray-500 mt-2">Bem-vindo ao Postvio. Aqui está o resumo de desempenho desta conta.</p>
         </div>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-gray-500 font-medium">Na Fila</h3>
-            <span className="w-10 h-10 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-xl">⏳</span>
-          </div>
-          <p className="text-4xl font-black text-gray-800">{estatisticas.pendentes}</p>
-          <p className="text-sm text-gray-400 mt-2">Vídeos a aguardar publicação</p>
+          <div className="flex items-center justify-between mb-4"><h3 className="text-gray-500 font-medium">Na Fila</h3><span className="w-10 h-10 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-xl">⏳</span></div>
+          <p className="text-4xl font-black text-gray-800">{estatisticas.pendentes}</p><p className="text-sm text-gray-400 mt-2">Vídeos a aguardar publicação</p>
         </div>
-
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-gray-500 font-medium">Publicados</h3>
-            <span className="w-10 h-10 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-xl">✅</span>
-          </div>
-          <p className="text-4xl font-black text-gray-800">{estatisticas.concluidos}</p>
-          <p className="text-sm text-gray-400 mt-2">Vídeos já processados</p>
+          <div className="flex items-center justify-between mb-4"><h3 className="text-gray-500 font-medium">Publicados</h3><span className="w-10 h-10 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-xl">✅</span></div>
+          <p className="text-4xl font-black text-gray-800">{estatisticas.concluidos}</p><p className="text-sm text-gray-400 mt-2">Vídeos já processados</p>
         </div>
-
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-gray-500 font-medium">Contas Ativas</h3>
-            <span className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">👥</span>
-          </div>
-          <p className="text-4xl font-black text-gray-800">{contas.length}</p>
-          <p className="text-sm text-gray-400 mt-2">Perfis conectados ao Postvio</p>
+          <div className="flex items-center justify-between mb-4"><h3 className="text-gray-500 font-medium">Contas Ativas</h3><span className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">👥</span></div>
+          <p className="text-4xl font-black text-gray-800">{contas.length}</p><p className="text-sm text-gray-400 mt-2">Perfis conectados ao Postvio</p>
         </div>
-
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-gray-500 font-medium">Motor IA</h3>
-            <span className="w-10 h-10 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center text-xl">⚡</span>
-          </div>
-          <p className="text-2xl font-black text-green-500">Operacional</p>
-          <p className="text-sm text-gray-400 mt-2">Sistema a correr normalmente</p>
+          <div className="flex items-center justify-between mb-4"><h3 className="text-gray-500 font-medium">Motor IA</h3><span className="w-10 h-10 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center text-xl">⚡</span></div>
+          <p className="text-2xl font-black text-green-500">Operacional</p><p className="text-sm text-gray-400 mt-2">Sistema a correr normalmente</p>
         </div>
-
       </div>
-
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg flex flex-col md:flex-row items-center justify-between">
         <div>
           <h3 className="text-xl font-bold mb-2">Próxima Publicação</h3>
           {estatisticas.proximaData ? (
             <>
               <p className="text-blue-100 text-sm mb-1 line-clamp-1 max-w-lg">"{estatisticas.proximaLegenda}"</p>
-              <p className="text-2xl font-black mt-2">
-                📅 {new Date(estatisticas.proximaData).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-              </p>
+              <p className="text-2xl font-black mt-2">📅 {new Date(estatisticas.proximaData).toLocaleString('pt-PT')}</p>
             </>
           ) : (
             <p className="text-blue-100">Não tem vídeos agendados para esta conta de momento.</p>
           )}
         </div>
-        
-        <div className="mt-6 md:mt-0">
-          <span className="text-5xl opacity-80">🚀</span>
-        </div>
+        <div className="mt-6 md:mt-0"><span className="text-5xl opacity-80">🚀</span></div>
       </div>
-
     </div>
   );
 }
-
 export default VisaoGeral;

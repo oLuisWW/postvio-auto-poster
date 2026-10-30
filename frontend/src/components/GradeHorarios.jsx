@@ -28,7 +28,8 @@ function GradeHorarios({ contaAtiva }) {
       
       const resposta = await fetch(`/api/horarios/?conta_id=${contaAtiva}`, {
         headers: {
-          'Authorization': `Bearer ${token}` 
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
         }
       });
       
@@ -73,7 +74,8 @@ function GradeHorarios({ contaAtiva }) {
         return fetch('/api/horarios/', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}` 
+            'Authorization': `Bearer ${token}`,
+            'ngrok-skip-browser-warning': 'true'
           },
           body: formData,
         });
@@ -102,7 +104,8 @@ function GradeHorarios({ contaAtiva }) {
         fetch(`/api/horarios/${item.id}`, { 
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}` 
+            'Authorization': `Bearer ${token}`,
+            'ngrok-skip-browser-warning': 'true'
           }
         })
       );

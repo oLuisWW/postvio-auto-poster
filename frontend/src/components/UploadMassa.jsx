@@ -67,7 +67,10 @@ function UploadMassa({ contaAtiva }) {
         const token = localStorage.getItem('postvio_token');
         const resposta = await fetch('/api/agendar/auto/', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'ngrok-skip-browser-warning': 'true'
+          },
           body: formData,
         });
         

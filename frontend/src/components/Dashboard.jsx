@@ -17,7 +17,10 @@ function Dashboard({ contaAtiva }) {
     try {
       const token = localStorage.getItem('postvio_token');
       const resposta = await fetch(`/api/agendar/fila/?conta_id=${contaAtiva}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
+        }
       });
       if (resposta.status === 401) return;
       
@@ -44,7 +47,10 @@ function Dashboard({ contaAtiva }) {
       const token = localStorage.getItem('postvio_token');
       const resposta = await fetch('/api/agendar/', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
+        },
         body: formData,
       });
       const dados = await resposta.json();
@@ -69,7 +75,10 @@ function Dashboard({ contaAtiva }) {
       const token = localStorage.getItem('postvio_token');
       const resposta = await fetch(`/api/agendar/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
+        }
       });
       const dados = await resposta.json();
       if (dados.status === 'sucesso') carregarFila();
@@ -84,7 +93,10 @@ function Dashboard({ contaAtiva }) {
       const token = localStorage.getItem('postvio_token');
       const resposta = await fetch(`/api/agendar/concluidos/${contaAtiva}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
+        }
       });
       const dados = await resposta.json();
       if (dados.status === 'sucesso') carregarFila();
