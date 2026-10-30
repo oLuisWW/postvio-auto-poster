@@ -17,20 +17,20 @@ const Auth = ({ onLoginSuccess }) => {
     try {
       if (isLogin) {
         // --- FAZER LOGIN ---
-        // O OAuth2 do FastAPI exige os dados no formato URL Encoded (URLSearchParams)
         const formData = new URLSearchParams();
-        formData.append('username', email); // O FastAPI OAuth2 chama username ao email
+        formData.append('username', email);
         formData.append('password', senha);
 
         const response = await axios.post('https://unapprovable-unneglected-pamelia.ngrok-free.dev/login', formData, {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          headers: { 
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'ngrok-skip-browser-warning': 'true'
+          }
         });
 
-        // Guarda o token e o nome do utilizador no navegador (LocalStorage)
         localStorage.setItem('postvio_token', response.data.access_token);
         localStorage.setItem('postvio_user', response.data.nome);
         
-        // Avisa o App.jsx que o login deu certo!
         onLoginSuccess();
       } else {
         // --- FAZER REGISTO ---
@@ -38,10 +38,14 @@ const Auth = ({ onLoginSuccess }) => {
           nome: nome,
           email: email,
           senha: senha
+        }, {
+          headers: {
+            'ngrok-skip-browser-warning': 'true'
+          }
         });
         
         setSucesso('Conta criada com sucesso! Pode fazer login.');
-        setIsLogin(true); // Volta para a aba de login
+        setIsLogin(true);
       }
     } catch (error) {
       if (error.response && error.response.data.detail) {

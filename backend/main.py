@@ -21,7 +21,6 @@ app = FastAPI()
 
 # -------------------------------------------------------------------
 # CONFIGURAÇÕES DE SEGURANÇA (JWT)
-# Diz ao FastAPI onde os clientes vão fazer login para receber o token
 # -------------------------------------------------------------------
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -44,9 +43,8 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:8000",
-        "https://postvio-auto-poster.vercel.app"
+        "https://postvio-auto-poster.vercel.app",
+        "http://localhost:5173"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -103,7 +101,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Gera o Token JWT com o ID do utilizador (o "sub" é o subject, o ID do dono da conta)
+    # Gera o Token JWT com o ID do utilizador
     token = criar_token_acesso(dados={"sub": str(usuario['id'])})
     
     return {"access_token": token, "token_type": "bearer", "nome": usuario['nome']}

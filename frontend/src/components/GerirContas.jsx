@@ -14,15 +14,16 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
 
   const carregarContas = async () => {
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token');
       
       const resposta = await fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/contas/', {
         headers: {
-          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave ao segurança
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
         }
       });
       
-      if (resposta.status === 401) return; // Se não tiver acesso, ignora silenciosamente (o App trata do logout)
+      if (resposta.status === 401) return;
       
       const dados = await resposta.json();
       if (dados.status === 'sucesso') {
@@ -47,12 +48,13 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
     }
 
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token');
       
       const resposta = await fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/contas/', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
         },
         body: formData,
       });
@@ -85,12 +87,13 @@ function GerirContas({ contaAtiva, setContaAtiva }) {
     if (!confirmacao) return;
 
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token');
       
       const resposta = await fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/contas/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
         }
       });
       const dados = await resposta.json();

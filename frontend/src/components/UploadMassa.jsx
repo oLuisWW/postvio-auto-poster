@@ -5,8 +5,7 @@ function UploadMassa({ contaAtiva }) {
   const [legendaPadrao, setLegendaPadrao] = useState('Novo vídeo no canal! 🚀 #viral');
   const [capaPadrao, setCapaPadrao] = useState(null);
   
-  // NOVOS ESTADOS PARA O MODO DE INTERVALO
-  const [modoAgendamento, setModoAgendamento] = useState('grade'); // 'grade' ou 'intervalo'
+  const [modoAgendamento, setModoAgendamento] = useState('grade');
   const [intervaloMinutos, setIntervaloMinutos] = useState(30);
   const [dataInicio, setDataInicio] = useState('');
   const [horaInicio, setHoraInicio] = useState('');
@@ -32,7 +31,6 @@ function UploadMassa({ contaAtiva }) {
   const iniciarUpload = async () => {
     if (videos.length === 0) return;
     
-    // Validação extra para o modo de intervalo
     if (modoAgendamento === 'intervalo' && (!dataInicio || !horaInicio || intervaloMinutos < 1)) {
       alert("Por favor, preencha a Data de Início, Hora de Início e o Intervalo corretamente.");
       return;
@@ -61,9 +59,8 @@ function UploadMassa({ contaAtiva }) {
       formData.append('legenda', legendaPadrao);
       formData.append('conta_id', contaAtiva);
       
-      // Enviamos o modo e a posição do vídeo para o backend conseguir calcular a hora exata
       formData.append('modo_agendamento', modoAgendamento);
-      formData.append('posicao_fila', i); // Passamos a posição do loop (0, 1, 2...)
+      formData.append('posicao_fila', i);
       
       if (capaPadrao) {
         formData.append('capa', capaPadrao);
@@ -76,13 +73,13 @@ function UploadMassa({ contaAtiva }) {
       }
 
       try {
-        const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave JWT
+        const token = localStorage.getItem('postvio_token');
         
         const resposta = await fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/agendar/auto/', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}` // 🔒 Mostra a chave ao segurança
-            // Nota: Não defina 'Content-Type' manualmente com FormData, o navegador faz isso automaticamente com os boundaries
+            'Authorization': `Bearer ${token}`,
+            'ngrok-skip-browser-warning': 'true'
           },
           body: formData,
         });
@@ -172,7 +169,6 @@ function UploadMassa({ contaAtiva }) {
               ></textarea>
             </div>
 
-            {/* SELETOR DE MODO DE AGENDAMENTO */}
             <div className="border-t border-gray-100 pt-4">
               <label className="block text-sm font-medium text-gray-700 mb-3">3. Como deseja agendar?</label>
               
@@ -193,7 +189,6 @@ function UploadMassa({ contaAtiva }) {
                 </button>
               </div>
 
-              {/* CAMPOS DO INTERVALO (Condicionais) */}
               {modoAgendamento === 'intervalo' && (
                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4 animate-fade-in">
                   <div>
@@ -244,7 +239,7 @@ function UploadMassa({ contaAtiva }) {
           </div>
         </div>
 
-        {/* COLUNA DIREITA: Fila de Processamento (Mantém-se igual) */}
+        {/* COLUNA DIREITA: Fila de Processamento */}
         <div className="lg:col-span-2 h-full flex flex-col overflow-hidden">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full min-h-0 overflow-hidden">
             <h3 className="text-xl font-semibold mb-4 shrink-0">Fila de Processamento</h3>

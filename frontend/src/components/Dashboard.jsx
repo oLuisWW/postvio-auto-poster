@@ -19,15 +19,16 @@ function Dashboard({ contaAtiva }) {
 
   const carregarFila = async () => {
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token');
       
       const resposta = await fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/agendar/fila/?conta_id=${contaAtiva}`, {
         headers: {
-          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
         }
       });
       
-      if (resposta.status === 401) return; // Se não tiver acesso, ignora (App trata o logout)
+      if (resposta.status === 401) return;
       
       const dados = await resposta.json();
       if (dados.status === 'sucesso') {
@@ -54,12 +55,13 @@ function Dashboard({ contaAtiva }) {
     }
 
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token');
       
       const resposta = await fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/agendar/', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
         },
         body: formData,
       });
@@ -90,12 +92,13 @@ function Dashboard({ contaAtiva }) {
     if (!confirmacao) return;
 
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token');
       
       const resposta = await fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/agendar/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
         }
       });
       const dados = await resposta.json();
@@ -110,12 +113,13 @@ function Dashboard({ contaAtiva }) {
     if (!confirmacao) return;
 
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token');
       
       const resposta = await fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/agendar/concluidos/${contaAtiva}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true'
         }
       });
       const dados = await resposta.json();
@@ -125,7 +129,6 @@ function Dashboard({ contaAtiva }) {
     }
   };
 
-  // --- ESTATÍSTICAS AUTOMÁTICAS ---
   const temConcluidos = fila.some(item => item.status === 'CONCLUIDO');
   const pendentes = fila.filter(item => item.status === 'PENDENTE');
   const concluidos = fila.filter(item => item.status === 'CONCLUIDO');
@@ -134,7 +137,6 @@ function Dashboard({ contaAtiva }) {
   return (
     <div className="max-w-6xl mx-auto flex flex-col h-[calc(100vh-100px)] overflow-hidden">
       
-      {/* --- NOVA ZONA DE ESTATÍSTICAS NO TOPO --- */}
       <div className="mb-6 shrink-0">
         <h2 className="text-3xl font-bold text-gray-800 mb-4">Painel Principal</h2>
         
@@ -167,7 +169,6 @@ function Dashboard({ contaAtiva }) {
         </div>
       </div>
 
-      {/* --- A SUA ZONA ORIGINAL DE VÍDEOS --- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1 min-h-0 overflow-hidden mb-4">
         
         {/* COLUNA ESQUERDA: Upload Manual */}
