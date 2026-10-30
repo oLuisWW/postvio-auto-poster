@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://unapprovable-unneglected-pamelia.ngrok-free.dev/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
