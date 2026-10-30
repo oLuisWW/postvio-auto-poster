@@ -35,7 +35,8 @@ function App() {
       
       const resposta = await fetch('/api/contas/', {
         headers: {
-          'Authorization': `Bearer ${token}` // 🔑 A MAGIA DO SAAS: Enviamos o token para o backend
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true' // 🔑 A MAGIA DO SAAS: Enviamos o token para o backend
         }
       });
 
