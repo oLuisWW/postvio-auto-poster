@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://unapprovable-unneglected-pamelia.ngrok-free.dev/:path*"
+      "source": "/api/(.*)",
+      "destination": "https://unapprovable-unneglected-pamelia.ngrok-free.dev/$1"
     },
     {
       "source": "/(.*)",
