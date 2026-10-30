@@ -16,16 +16,12 @@ const Auth = ({ onLoginSuccess }) => {
 
     try {
       if (isLogin) {
-        // --- FAZER LOGIN ---
         const formData = new URLSearchParams();
         formData.append('username', email);
         formData.append('password', senha);
 
-        const response = await axios.post('https://unapprovable-unneglected-pamelia.ngrok-free.dev/login', formData, {
-          headers: { 
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'ngrok-skip-browser-warning': 'true'
-          }
+        const response = await axios.post('/api/login', formData, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
 
         localStorage.setItem('postvio_token', response.data.access_token);
@@ -33,15 +29,10 @@ const Auth = ({ onLoginSuccess }) => {
         
         onLoginSuccess();
       } else {
-        // --- FAZER REGISTO ---
-        const response = await axios.post('https://unapprovable-unneglected-pamelia.ngrok-free.dev/registrar', {
+        const response = await axios.post('/api/registrar', {
           nome: nome,
           email: email,
           senha: senha
-        }, {
-          headers: {
-            'ngrok-skip-browser-warning': 'true'
-          }
         });
         
         setSucesso('Conta criada com sucesso! Pode fazer login.');

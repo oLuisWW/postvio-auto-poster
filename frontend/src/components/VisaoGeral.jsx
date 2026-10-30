@@ -16,8 +16,13 @@ function VisaoGeral({ contaAtiva, contas }) {
 
   const carregarDados = async () => {
     try {
-      // Usamos a mesma rota da fila para fazer a matemática no frontend sem pesar o backend
-      const resposta = await fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/agendar/fila/?conta_id=${contaAtiva}`);
+      const token = localStorage.getItem('postvio_token'); // Adicionado o token de segurança
+      
+      const resposta = await fetch(`/api/agendar/fila/?conta_id=${contaAtiva}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const dados = await resposta.json();
 
       if (dados.status === 'sucesso') {
@@ -25,7 +30,6 @@ function VisaoGeral({ contaAtiva, contas }) {
         const pendentes = fila.filter(v => v.status === 'PENDENTE');
         const concluidos = fila.filter(v => v.status === 'CONCLUIDO');
 
-        // Como o backend já devolve a fila ordenada por data, o primeiro pendente é o próximo vídeo a sair
         const proxima = pendentes.length > 0 ? pendentes[0] : null;
 
         setEstatisticas({
@@ -40,7 +44,6 @@ function VisaoGeral({ contaAtiva, contas }) {
     }
   };
 
-  // Encontra os detalhes da conta ativa para personalizar o painel
   const contaAtual = contas.find(c => c.id === contaAtiva);
 
   return (
@@ -55,10 +58,8 @@ function VisaoGeral({ contaAtiva, contas }) {
         </div>
       </div>
 
-      {/* Grid de Cartões de Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         
-        {/* Cartão 1: Vídeos Pendentes */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-gray-500 font-medium">Na Fila</h3>
@@ -68,7 +69,6 @@ function VisaoGeral({ contaAtiva, contas }) {
           <p className="text-sm text-gray-400 mt-2">Vídeos a aguardar publicação</p>
         </div>
 
-        {/* Cartão 2: Vídeos Concluídos */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-gray-500 font-medium">Publicados</h3>
@@ -78,7 +78,6 @@ function VisaoGeral({ contaAtiva, contas }) {
           <p className="text-sm text-gray-400 mt-2">Vídeos já processados</p>
         </div>
 
-        {/* Cartão 3: Contas Geridas */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-gray-500 font-medium">Contas Ativas</h3>
@@ -88,7 +87,6 @@ function VisaoGeral({ contaAtiva, contas }) {
           <p className="text-sm text-gray-400 mt-2">Perfis conectados ao Postvio</p>
         </div>
 
-        {/* Cartão 4: Espaço (Fictício para já, para visual de SaaS) */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center transform hover:-translate-y-1 transition-transform">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-gray-500 font-medium">Motor IA</h3>
@@ -100,7 +98,6 @@ function VisaoGeral({ contaAtiva, contas }) {
 
       </div>
 
-      {/* Secção de Próxima Ação */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg flex flex-col md:flex-row items-center justify-between">
         <div>
           <h3 className="text-xl font-bold mb-2">Próxima Publicação</h3>

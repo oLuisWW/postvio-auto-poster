@@ -39,14 +39,11 @@ def startup_event():
 os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
-# --- CORREÇÃO DO CORS AQUI ---
+# --- CORREÇÃO DEFINITIVA DO CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://postvio-auto-poster.vercel.app",
-        "http://localhost:5173"
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],     # Aceita pedidos de qualquer origem (Vercel, Localhost, etc) sem restrições
+    allow_credentials=False, # <-- MUDAR PARA FALSE (Como usamos Token JWT, isto desativa o bloqueio rigoroso do navegador)
     allow_methods=["*"],
     allow_headers=["*"],
 )

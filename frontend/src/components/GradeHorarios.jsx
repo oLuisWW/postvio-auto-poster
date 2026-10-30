@@ -24,15 +24,15 @@ function GradeHorarios({ contaAtiva }) {
 
   const carregarHorarios = async () => {
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token'); 
       
-      const resposta = await fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/horarios/?conta_id=${contaAtiva}`, {
+      const resposta = await fetch(`/api/horarios/?conta_id=${contaAtiva}`, {
         headers: {
-          'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+          'Authorization': `Bearer ${token}` 
         }
       });
       
-      if (resposta.status === 401) return; // Se não tiver acesso, ignora
+      if (resposta.status === 401) return; 
       
       const dados = await resposta.json();
       if (dados.status === 'sucesso') {
@@ -62,7 +62,7 @@ function GradeHorarios({ contaAtiva }) {
     setMensagem('A guardar...');
 
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token'); 
       
       const promessas = diasSelecionados.map(dia => {
         const formData = new FormData();
@@ -70,10 +70,10 @@ function GradeHorarios({ contaAtiva }) {
         formData.append('horario', hora);
         formData.append('conta_id', contaAtiva);
         
-        return fetch('https://unapprovable-unneglected-pamelia.ngrok-free.dev/horarios/', {
+        return fetch('/api/horarios/', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+            'Authorization': `Bearer ${token}` 
           },
           body: formData,
         });
@@ -96,13 +96,13 @@ function GradeHorarios({ contaAtiva }) {
     if (!confirmacao) return;
 
     try {
-      const token = localStorage.getItem('postvio_token'); // 🔒 Pega a chave
+      const token = localStorage.getItem('postvio_token'); 
       
       const promessas = itensDoGrupo.map(item => 
-        fetch(`https://unapprovable-unneglected-pamelia.ngrok-free.dev/horarios/${item.id}`, { 
+        fetch(`/api/horarios/${item.id}`, { 
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}` // 🔒 Mostra a chave
+            'Authorization': `Bearer ${token}` 
           }
         })
       );
