@@ -9,6 +9,12 @@ function Dashboard({ contaAtiva }) {
   const [hora, setHora] = useState('');
   const [mensagem, setMensagem] = useState('');
 
+  const [idReagendar, setIdReagendar] = useState(null);
+  const [novaData, setNovaData] = useState('');
+  const [novaHora, setNovaHora] = useState('');
+
+  const [abaAtiva, setAbaAtiva] = useState('pendentes'); // Estado para gerenciar a aba ativa
+
   useEffect(() => {
     if (contaAtiva) carregarFila();
   }, [contaAtiva]);
@@ -87,6 +93,39 @@ function Dashboard({ contaAtiva }) {
     }
   };
 
+  const salvarReagendamento = async (id) => {
+    if (!novaData || !novaHora) {
+      alert("Preencha a nova data e hora!");
+      return;
+    }
+    try {
+      const dataHoraFormatada = `${novaData} ${novaHora}:00`;
+      const formData = new URLSearchParams();
+      formData.append('nova_data_hora', dataHoraFormatada);
+
+      const token = localStorage.getItem('postvio_token');
+      const resposta = await fetch(`/api/agendar/${id}/reagendar`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData
+      });
+      
+      const dados = await resposta.json();
+      if (dados.status === 'sucesso') {
+        setIdReagendar(null);
+        carregarFila();
+      } else {
+        alert(dados.detail || "Erro ao reagendar");
+      }
+    } catch (erro) {
+      console.error("Erro ao reagendar:", erro);
+    }
+  };
+
   const limparConcluidos = async () => {
     if (!window.confirm("Apagar TODOS os vídeos já concluídos?")) return;
     try {
@@ -107,7 +146,15 @@ function Dashboard({ contaAtiva }) {
 
   const pendentes = fila.filter(item => item.status === 'PENDENTE');
   const concluidos = fila.filter(item => item.status === 'CONCLUIDO');
+  const atrasadosOuComErro = fila.filter(item => item.status === 'ATRASADO' || item.status === 'ERRO');
   const proxima = pendentes.length > 0 ? pendentes[0] : null;
+
+  const exibirVideosPorAba = () => {
+    if (abaAtiva === 'pendentes') return pendentes;
+    if (abaAtiva === 'concluidos') return concluidos;
+    if (abaAtiva === 'atrasados') return atrasadosOuComErro;
+    return [];
+  };
 
   return (
     <div className="max-w-6xl mx-auto flex flex-col h-[calc(100vh-100px)] overflow-hidden">
@@ -154,16 +201,23 @@ function Dashboard({ contaAtiva }) {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full min-h-0 overflow-hidden">
             <div className="flex justify-between items-center mb-4 shrink-0">
               <h3 className="text-xl font-semibold">Próximos Vídeos</h3>
-              {concluidos.length > 0 && (
-                <button onClick={limparConcluidos} className="text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-100">Apagar concluídos</button>
+              
+              <div className="flex gap-2 border-b border-gray-200 w-full justify-start overflow-x-auto">
+                 <button onClick={() => setAbaAtiva('pendentes')} className={`py-2 px-4 text-sm font-medium ${abaAtiva === 'pendentes' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>Pendentes</button>
+                 <button onClick={() => setAbaAtiva('concluidos')} className={`py-2 px-4 text-sm font-medium ${abaAtiva === 'concluidos' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>Concluídos</button>
+                 <button onClick={() => setAbaAtiva('atrasados')} className={`py-2 px-4 text-sm font-medium ${abaAtiva === 'atrasados' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>Atrasados/Erros</button>
+              </div>
+
+              {abaAtiva === 'concluidos' && concluidos.length > 0 && (
+                <button onClick={limparConcluidos} className="text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-100 whitespace-nowrap ml-4">Apagar concluídos</button>
               )}
             </div>
             
-            {fila.length === 0 ? (
-              <div className="text-center py-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl flex-1 flex flex-col justify-center">Nenhum vídeo agendado.</div>
+            {exibirVideosPorAba().length === 0 ? (
+              <div className="text-center py-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl flex-1 flex flex-col justify-center">Nenhum vídeo nesta aba.</div>
             ) : (
               <div className="space-y-4 overflow-y-auto pr-2 flex-1 min-h-0 scrollbar-thin">
-                {fila.map((item) => (
+                {exibirVideosPorAba().map((item) => (
                   <div key={item.id} className="flex gap-4 p-4 border border-gray-100 rounded-xl hover:shadow-md transition-shadow bg-white shrink-0 group">
                     <div className="w-32 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
                       {item.caminho_capa ? (
@@ -175,12 +229,32 @@ function Dashboard({ contaAtiva }) {
                     <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                       <div>
                         <div className="flex justify-between items-start">
-                          <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${item.status === 'PENDENTE' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>{item.status}</span>
-                          <button onClick={() => apagarVideo(item.id)} className="text-gray-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-all shrink-0">❌</button>
+                          <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${item.status === 'PENDENTE' ? 'bg-amber-100 text-amber-700' : item.status === 'CONCLUIDO' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{item.status}</span>
+                          
+                          <div className="flex gap-1">
+                            <button onClick={() => { setIdReagendar(item.id); setNovaData(''); setNovaHora(''); }} className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 p-1.5 rounded-md transition-all shrink-0" title="Reagendar Data">🔄</button>
+                            <button onClick={() => apagarVideo(item.id)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-all shrink-0" title="Apagar Vídeo">❌</button>
+                          </div>
                         </div>
                         <p className="mt-2 text-sm text-gray-600 line-clamp-2 break-all">{item.legenda}</p>
                       </div>
-                      <p className="text-sm font-semibold text-gray-800 mt-2">📅 {new Date(item.data_hora_agendamento).toLocaleString('pt-PT')}</p>
+                      
+                      {idReagendar === item.id ? (
+                        <div className="mt-3 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                          <p className="text-xs font-bold text-blue-800 mb-2">Reagendar para:</p>
+                          <div className="flex gap-2 mb-2">
+                            <input type="date" value={novaData} onChange={(e) => setNovaData(e.target.value)} className="w-full text-xs border border-blue-200 p-1.5 rounded" />
+                            <input type="time" value={novaHora} onChange={(e) => setNovaHora(e.target.value)} className="w-full text-xs border border-blue-200 p-1.5 rounded" />
+                          </div>
+                          <div className="flex gap-2">
+                            <button onClick={() => salvarReagendamento(item.id)} className="flex-1 bg-blue-600 text-white text-xs font-bold py-1.5 rounded hover:bg-blue-700 transition-colors">Guardar</button>
+                            <button onClick={() => setIdReagendar(null)} className="flex-1 bg-white border border-gray-300 text-gray-700 text-xs font-bold py-1.5 rounded hover:bg-gray-50 transition-colors">Cancelar</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm font-semibold text-gray-800 mt-2">📅 {new Date(item.data_hora_agendamento).toLocaleString('pt-PT')}</p>
+                      )}
+                      
                     </div>
                   </div>
                 ))}
