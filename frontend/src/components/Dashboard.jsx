@@ -13,7 +13,7 @@ function Dashboard({ contaAtiva }) {
   const [novaData, setNovaData] = useState('');
   const [novaHora, setNovaHora] = useState('');
 
-  const [abaAtiva, setAbaAtiva] = useState('pendentes'); // Estado para gerenciar a aba ativa
+  const [abaAtiva, setAbaAtiva] = useState('pendentes'); // Estado das abas
 
   useEffect(() => {
     if (contaAtiva) carregarFila();
@@ -202,6 +202,7 @@ function Dashboard({ contaAtiva }) {
             <div className="flex justify-between items-center mb-4 shrink-0">
               <h3 className="text-xl font-semibold">Próximos Vídeos</h3>
               
+              {/* AS NOSSAS ABAS NOVAS */}
               <div className="flex gap-2 border-b border-gray-200 w-full justify-start overflow-x-auto">
                  <button onClick={() => setAbaAtiva('pendentes')} className={`py-2 px-4 text-sm font-medium ${abaAtiva === 'pendentes' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>Pendentes</button>
                  <button onClick={() => setAbaAtiva('concluidos')} className={`py-2 px-4 text-sm font-medium ${abaAtiva === 'concluidos' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>Concluídos</button>

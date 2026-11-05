@@ -5,6 +5,46 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from instagrapi import Client
 from database import conectar_banco
 
+# --- FUNÇÃO RECUPERADA PARA A GRADE DE HORÁRIOS ---
+def obter_proximo_horario_livre(conta_id):
+    conn = conectar_banco()
+    cursor = conn.cursor(dictionary=True)
+    
+    cursor.execute("SELECT dia_semana, horario FROM horarios_padrao WHERE conta_id = %s ORDER BY dia_semana, horario", (conta_id,))
+    grade = cursor.fetchall()
+    
+    if not grade:
+        return None
+        
+    cursor.execute("SELECT data_hora_agendamento FROM postagens WHERE status = 'PENDENTE' AND conta_id = %s", (conta_id,))
+    ocupados_db = cursor.fetchall()
+    horarios_ocupados = [o['data_hora_agendamento'].strftime('%Y-%m-%d %H:%M:%S') for o in ocupados_db]
+    
+    agora = datetime.now()
+    
+    for i in range(365):
+        data_teste = agora.date() + timedelta(days=i)
+        dia_semana_teste = data_teste.weekday()
+        
+        for g in grade:
+            if g['dia_semana'] == dia_semana_teste:
+                segundos = g['horario'].total_seconds()
+                horas = int(segundos // 3600)
+                minutos = int((segundos % 3600) // 60)
+                
+                data_hora_candidata = datetime(data_teste.year, data_teste.month, data_teste.day, horas, minutos, 0)
+                str_candidata = data_hora_candidata.strftime('%Y-%m-%d %H:%M:%S')
+                
+                if data_hora_candidata > agora and str_candidata not in horarios_ocupados:
+                    cursor.close()
+                    conn.close()
+                    return str_candidata
+
+    cursor.close()
+    conn.close()
+    return None
+
+# --- MOTOR DE PUBLICAÇÃO E OTIMIZADOR ---
 def otimizar_video_para_instagram(caminho_original):
     diretorio, nome_ficheiro = os.path.split(caminho_original)
     nome_base, _ = os.path.splitext(nome_ficheiro)
@@ -33,9 +73,9 @@ def otimizar_video_para_instagram(caminho_original):
 def verificar_e_publicar():
     agora = datetime.now()
     agora_str = agora.strftime("%Y-%m-%d %H:%M:%S")
+    # Trava de segurança: vídeos marcados para há mais de 30 minutos atrás são bloqueados
     limite_atraso = agora - timedelta(minutes=30)
-    limite_atraso_str = limite_atraso.strftime("%Y-%m-%d %H:%M:%S")
-
+    
     print(f"[{agora_str}] 🔍 A verificar Fila de Publicação...")
 
     try:
@@ -52,7 +92,7 @@ def verificar_e_publicar():
         videos_para_publicar = cursor.fetchall()
 
         for video in videos_para_publicar:
-            # Verifica se o vídeo está muito atrasado (mais de 30 minutos)
+            # Verifica se o vídeo está muito atrasado e manda-o para a nova aba do painel
             if video['data_hora_agendamento'] < limite_atraso:
                 print(f"⚠️ Vídeo {video['id']} ignorado pois está mais de 30 minutos atrasado. Marcando como ATRASADO.")
                 cursor.execute("UPDATE postagens SET status = 'ATRASADO' WHERE id = %s", (video['id'],))
@@ -87,7 +127,7 @@ def verificar_e_publicar():
                 legenda_post = video['legenda'] if video['legenda'] else ""
 
                 if len(senha_conta) < 5:
-                    raise Exception("A conta não tem uma Chave de Autenticação (Session ID) válida na base de dados.")
+                    raise Exception("A conta não tem uma Chave de Autenticação (Session ID) válida.")
 
                 if len(senha_conta) > 30 and "%" in senha_conta:
                     print("🔐 A usar autenticação blindada por Session ID...")
